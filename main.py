@@ -37,7 +37,7 @@ def generate_sine(darkness_map, frequency_scale=100):
     return sine_points
 
 
-def draw_sines(sine_amt, img_matrix):
+def draw_sines(sine_amt, img_matrix, frequency_scale, line_weight):
     # Create an empty image
     out_size = (img_matrix.shape[1], img_matrix.shape[0])
     base = Image.new("L", out_size, color=255)
@@ -59,7 +59,7 @@ def draw_sines(sine_amt, img_matrix):
                                            (current_sine+1) * delta)
 
         # Generate the points
-        sine_to_draw = generate_sine(dark_map)
+        sine_to_draw = generate_sine(dark_map, frequency_scale=frequency_scale)
         # Scale the sine to the required size on the y-axis.
         scaled_sine = sine_to_draw*delta
         # Find the center point for the wave to begin, on the y-axis:
@@ -81,16 +81,19 @@ def draw_sines(sine_amt, img_matrix):
             # Jump a row if we hit the break point
             loc += 3
         xy = pts_list[loc-1], pts_list[loc]
-        canvas.line(xy, fill=25, width=1)
+        canvas.line(xy, fill=25, width=line_weight)
         loc += 1
     return base
 
 
 if __name__ == "__main__":
-    # Configuration
-    total_amt_sines = 70  # Amount of sine waves in the image
+    # ----------------- Configuration -------------------------------
+    total_amt_sines = 70        # Amount of sine waves in the image
+    resize_factor = 3           # Scaling factor for the input image
+    frequency_factor = 150      # Frequency
+    line_thickness = 1          # Line thickness in pixels
+    # ----------------------------------------------------------------
 
-    # End of Configuration
-    img_file, img_mat = load_image("marya.jpg", resize=1)
-    output = draw_sines(total_amt_sines, img_mat)
+    img_file, img_mat = load_image("mari.jpg", resize=resize_factor)
+    output = draw_sines(total_amt_sines, img_mat, frequency_factor, line_thickness)
     output.show()
