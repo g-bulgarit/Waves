@@ -1,8 +1,5 @@
 from PIL import Image, ImageDraw
 import numpy as np
-from scipy.signal import savgol_filter
-from matplotlib import pyplot as plt
-
 
 def load_image(path):
     img = Image.open(path)
@@ -16,7 +13,6 @@ def load_image(path):
 def collapse_pixels_to_line(img_matrix, start_y, end_y):
     w_matrix = np.copy(img_matrix)
     line = 255 - (w_matrix[start_y:end_y].sum(axis=0)//(end_y - start_y))
-    line = savgol_filter(line, 7, 3)  # window size 51, polynomial order 3
 
     # normalize 0-> 1
     line = line/255
