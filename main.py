@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 def load_image(path):
     img = Image.open(path)
     img_x = img.size[0]*4
-    img_y = img.size[0]*4
+    img_y = img.size[1]*4
     img = img.resize((img_x, img_y))
     img = img.convert("L")  # move to gray scale
     return img, np.asarray(img)
@@ -35,13 +35,17 @@ def generate_sine(darkness_map, frequency_scale=10, vary_amplitude=False):
 
 
 def draw_sines(sine_amt, img_mat):
+
+    pts_list = []
+
     # Create an empty image
-    new_image_x = img_mat.shape[1]
-    new_image_y = img_mat.shape[0]
+    new_image_x = img_mat.shape[0]
+    new_image_y = img_mat.shape[1]
 
     out_size = (new_image_x, new_image_y)
 
-    canvas = Image.new("L", out_size, color=255)
+    base = Image.new("L", out_size, color=255)
+    canvas = ImageDraw.Draw(base)
     delta = (out_size[0]//sine_amt)
 
     sample_rate = np.arange(0, out_size[1])
@@ -53,7 +57,6 @@ def draw_sines(sine_amt, img_mat):
         sine_to_draw = generate_sine(dark_map, vary_amplitude=True)
         scaled_sine = sine_to_draw*delta
 
-
         # DRAW:
         center_y = int(current_sine*delta) + delta/2
         for pt in range(0, len(sample_rate)):
@@ -62,8 +65,20 @@ def draw_sines(sine_amt, img_mat):
                 print("nan")
             else:
                 coord = (pt, int(y_val))
-                canvas.putpixel(coord, 0)
-    canvas.show()
+                pts_list.append(coord)
+        pts_list.append("BREAK")
+
+
+
+    loc = 1
+    while loc < len(pts_list)-2:
+        if pts_list[loc] == "BREAK":
+            loc += 3
+        xy = pts_list[loc-1], pts_list[loc]
+        canvas.line(xy, fill=0, width=1)
+        loc +=1
+
+    base.show()
 
 
 
@@ -78,12 +93,12 @@ if __name__ == "__main__":
     # Draw sines with respect to pixel size, changing in frequency
 
     # Configuration
-    total_amt_sines = 50
+    total_amt_sines = 100
 
     # End of Configuration
 
 
-    img_file, img_mat = load_image("calibration_image.png")
+    img_file, img_mat = load_image("mari.jpg")
 
     draw_sines(total_amt_sines, img_mat)
     # darkness = np.linspace(0, 255, num=2000, dtype=np.float)
