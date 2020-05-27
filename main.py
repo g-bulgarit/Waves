@@ -1,10 +1,11 @@
 from PIL import Image, ImageDraw
 import numpy as np
 
-def load_image(path):
+
+def load_image(path, resize=1):
     img = Image.open(path)
-    img_x = img.size[0]*8
-    img_y = img.size[1]*8
+    img_x = img.size[0]*resize
+    img_y = img.size[1]*resize
     img = img.resize((img_x, img_y))
     img = img.convert("L")  # move to gray scale
     return img, np.asarray(img)
@@ -19,20 +20,20 @@ def collapse_pixels_to_line(img_matrix, start_y, end_y):
     return line
 
 
-def generate_sine(darkness_map, frequency_scale=100, vary_amplitude=False):
+def generate_sine(darkness_map, frequency_scale=100):
+    # Get the base frequency based on darkness of our pixels:
     omega_arr = darkness_map * 2 * np.pi * frequency_scale
-    amp_scaler = 0.5
 
-    if vary_amplitude:
-        amp_scaler = darkness_map * 2 * np.pi * 1
-        max_amp = np.max(amp_scaler)
-        amp_scaler /= max_amp
+    # Scale amplitude as well:
+    amp_scaler = darkness_map * 2 * np.pi * 1
+    max_amp = np.max(amp_scaler)
+    amp_scaler /= max_amp
 
+    # Build the "time scale":
     x_arr = np.arange(darkness_map.shape[0])/300
-    sine_points = 0.5 * amp_scaler * np.sin(omega_arr * x_arr)
-    # max_val = np.max(sine_points)
-    # sine_normalized = sine_points / max_val
 
+    # Generate final sine as np array:
+    sine_points = 0.5 * amp_scaler * np.sin(omega_arr * x_arr)
     return sine_points
 
 
@@ -45,8 +46,8 @@ def draw_sines(sine_amt, img_matrix):
     canvas = ImageDraw.Draw(base)
 
     # Calculate the distance between each sine
-    delta = (out_size[0]//sine_amt)
-    x_axis_steps = np.arange(0, out_size[1])
+    delta = (out_size[1]//sine_amt)
+    x_axis_steps = np.arange(0, out_size[0])
     # Make an empty points list
     pts_list = []
 
@@ -58,7 +59,7 @@ def draw_sines(sine_amt, img_matrix):
                                            (current_sine+1) * delta)
 
         # Generate the points
-        sine_to_draw = generate_sine(dark_map, vary_amplitude=True)
+        sine_to_draw = generate_sine(dark_map)
         # Scale the sine to the required size on the y-axis.
         scaled_sine = sine_to_draw*delta
         # Find the center point for the wave to begin, on the y-axis:
@@ -87,9 +88,9 @@ def draw_sines(sine_amt, img_matrix):
 
 if __name__ == "__main__":
     # Configuration
-    total_amt_sines = 70
+    total_amt_sines = 70  # Amount of sine waves in the image
 
     # End of Configuration
-    img_file, img_mat = load_image("mari.jpg")
+    img_file, img_mat = load_image("marya.jpg", resize=1)
     output = draw_sines(total_amt_sines, img_mat)
     output.show()
