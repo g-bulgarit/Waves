@@ -24,26 +24,28 @@ def generate_sine(darkness_map, frequency_scale=100):
     # Get the base frequency based on darkness of our pixels:
     omega_arr = darkness_map * 2 * np.pi * frequency_scale
 
-    # Scale amplitude as well:
-    amp_scaler = darkness_map * 2 * np.pi * 1
+    # Scale amplitude by pixel darkness as well:
+    amp_scaler = darkness_map * 2 * np.pi
+
+    # Normalize 0 -> 1
     max_amp = np.max(amp_scaler)
     amp_scaler /= max_amp
 
-    # Build the "time scale":
-    x_arr = np.arange(darkness_map.shape[0])/300
+    # Build the time scale:
+    x_arr = np.arange(darkness_map.shape[0])/2**10*np.pi
 
     # Generate final sine as np array:
-    sine_points = 0.5 * amp_scaler * np.sin(omega_arr * x_arr)
+    sine_points = 0.45 * amp_scaler * np.sin(omega_arr * x_arr)
     return sine_points
 
 
 def draw_sines(sine_amt, img_matrix, frequency_scale, line_weight):
     # Create an empty image
     out_size = (img_matrix.shape[1], img_matrix.shape[0])
-    base = Image.new("L", out_size, color=255)
+    base_img = Image.new("L", out_size, color=255)
 
     # Create canvas to draw on
-    canvas = ImageDraw.Draw(base)
+    canvas = ImageDraw.Draw(base_img)
 
     # Calculate the distance between each sine
     delta = (out_size[1]//sine_amt)
@@ -83,14 +85,14 @@ def draw_sines(sine_amt, img_matrix, frequency_scale, line_weight):
         xy = pts_list[loc-1], pts_list[loc]
         canvas.line(xy, fill=25, width=line_weight)
         loc += 1
-    return base
+    return base_img
 
 
 if __name__ == "__main__":
     # ----------------- Configuration -------------------------------
-    total_amt_sines = 70        # Amount of sine waves in the image
-    resize_factor = 3           # Scaling factor for the input image
-    frequency_factor = 150      # Frequency
+    total_amt_sines = 50        # Amount of sine waves in the image
+    resize_factor = 4           # Scaling factor for the input image
+    frequency_factor = 50*np.pi        # Frequency scalar, higher means higher frequency on average
     line_thickness = 1          # Line thickness in pixels
     # ----------------------------------------------------------------
 
