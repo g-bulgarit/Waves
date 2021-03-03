@@ -32,7 +32,7 @@ def generate_sine(darkness_map, frequency_scale=100):
     amp_scaler /= max_amp
 
     # Build the time scale:
-    x_arr = np.arange(darkness_map.shape[0])/2**10*np.pi
+    x_arr = np.arange(darkness_map.shape[0])/omega_arr
 
     # Generate final sine as np array:
     sine_points = 0.45 * amp_scaler * np.sin(omega_arr * x_arr)
@@ -96,6 +96,6 @@ if __name__ == "__main__":
     line_thickness = 1          # Line thickness in pixels
     # ----------------------------------------------------------------
 
-    img_file, img_mat = load_image("mari.jpg", resize=resize_factor)
+    img_file, img_mat = load_image("mari.png", resize=resize_factor)
     output = draw_sines(total_amt_sines, img_mat, frequency_factor, line_thickness)
     output.show()
