@@ -1,9 +1,7 @@
 # Waves
-This thing draws sines for your favourite image.
-Why? I don't know.
+Takes in an image and tries to draw it with horizontal sine waves, with changing amplitude.
 
-Parameters can be tweaked to achieve peak image clarity.\
-Is image clarity necessary? Surely I wouldn't know.
+Parameters can be tweaked to change image clarity.
 _________________
 # Example
 <img height=600px src="https://i.imgur.com/HheibfC.png">
